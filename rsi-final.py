@@ -19,7 +19,7 @@ def rsi(ohlc: pandas.DataFrame, period: int = 11):
 
     return pandas.Series(100 - (100/(1 + RS)), name = "RSI")
 
-coinlist = ["KRW-KAVA"] 
+coinlist = ['KRW-AXS']
 lower28 = []
 higher70 = []
 
@@ -31,53 +31,58 @@ while(True):
     for i in range(len(coinlist)):
         data = pyupbit.get_ohlcv(ticker=coinlist[i], interval="minute1")
         now_rsi = rsi(data, 11).iloc[-1]
-        print("코인명: ", coinlist[i])
-        print("현재시간: ", datetime.datetime.now())
+        avg_buy_price = upbit.get_avg_buy_price('KRW-AXS')
+        now_price = pyupbit.get_current_price(coinlist) 
+        print("name: ", coinlist[i])         
+        print("nowtime: ", datetime.datetime.now())
         print("RSI :", now_rsi)
+        print("buy_price:", avg_buy_price)
+        print("now_price:", now_price)
         print()
         if now_rsi <= 28 :
             lower28[i] = True
-        elif now_rsi >= 33 and lower28[i] == True:
+        elif now_rsi >= 33 and lower28[i] == True :
             buy(coinlist[i])
             lower28[i] = False
-        elif now_rsi >= 70 and higher70[i] == False:
-            sell(coinlist[i])
+        elif now_rsi >= 70 and higher70[i] == False :
+            if (avg_buy_price + 700.0) <= now_price and avg_buy_price > 0 :
+                amount = upbit.get_balance('KRW-AXS') 
+                cur_price = pyupbit.get_current_price('KRW-AXS') 
+                total = amount * cur_price
+                if total > 5000 : 
+                    print(upbit.sell_market_order('KRW-AXS', amount))
+                time.sleep(1)
             higher70[i] = True
         elif now_rsi <= 60 :
+            if (avg_buy_price + 700.0) <= now_price and avg_buy_price > 0 :
+                amount = upbit.get_balance('KRW-AXS') 
+                cur_price = pyupbit.get_current_price('KRW-AXS') 
+                total = amount * cur_price
+                if total > 5000 : 
+                    print(upbit.sell_market_order('KRW-AXS', amount))
+                time.sleep(1)
+            if (now_price + 300.0) <= avg_buy_price and avg_buy_price > 0 :
+                amount = upbit.get_balance('KRW-AXS') 
+                cur_price = pyupbit.get_current_price('KRW-AXS') 
+                total = amount * cur_price
+                if total > 5000 : 
+                    print(upbit.sell_market_order('KRW-AXS', amount))
+                time.sleep(1)
             higher70[i] = False
     time.sleep(0.5)
-    
-    def buy(coin): 
-        money = upbit.get_balance("KRW")
-        #cur_price = pyupbit.get_current_price(coin)
-        #avg_price = upbit.get_avg_buy_price("KRW")
-        #buy_profit = ((cur_price - avg_price) / avg_price) * 100
-        #profit = round(buy_profit, 2)
 
-        if money < 20000 : 
-            print(upbit.buy_market_order(coin, money)) 
-        elif money < 50000 : 
-            print(upbit.buy_market_order(coin, money*0.4)) 
-        elif money < 100000 : 
-            print(upbit.buy_market_order(coin, money*0.3)) 
-        else: 
-            print(upbit.buy_market_order(coin, money*0.2)) 
-        return 
-
+    def buy(coinlist): 
+        krw_balance = upbit.get_balance("KRW")
+        krw_price = 420000
+        if krw_balance > krw_price : 
+            upbit.buy_market_order(ticker=coinlist, price=krw_price, )
+        else:
+            pass
+        return
     def sell(coin): 
         amount = upbit.get_balance(coin) 
-        cur_price = pyupbit.get_current_price(coin)
-        avg_price = upbit.get_avg_buy_price("KRW-KAVA")
-        buy_profit = ((cur_price - avg_price) / avg_price) * 100
-        profit = round(buy_profit, 2)
-
-        total = amount * cur_price 
-        if profit >= 2.0 and total < 20000 : 
+        cur_price = pyupbit.get_current_price(coin) 
+        total = amount * cur_price
+        if total > 5000 : 
             print(upbit.sell_market_order(coin, amount))
-        elif profit >= 2.0 and total < 50000 :
-            print(upbit.sell_market_order(coin, amount*0.4))
-        elif profit >= 2.0 and total < 100000 :
-            print(upbit.sell_market_order(coin, amount*0.3))
-        else : 
-            print(upbit.buy_market_order(coin, amount*0.2))
         return
