@@ -19,7 +19,7 @@ def rsi(ohlc: pandas.DataFrame, period: int = 11):
 
     return pandas.Series(100 - (100/(1 + RS)), name = "RSI")
 
-coinlist = ['KRW-AXS']
+coinlist = ['KRW-ZRX']
 lower28 = []
 higher70 = []
 
@@ -31,7 +31,7 @@ while(True):
     for i in range(len(coinlist)):
         data = pyupbit.get_ohlcv(ticker=coinlist[i], interval="minute1")
         now_rsi = rsi(data, 11).iloc[-1]
-        avg_buy_price = upbit.get_avg_buy_price('KRW-AXS')
+        avg_buy_price = upbit.get_avg_buy_price('KRW-ZRX')
         now_price = pyupbit.get_current_price(coinlist) 
         print("name: ", coinlist[i])         
         print("nowtime: ", datetime.datetime.now())
@@ -45,35 +45,35 @@ while(True):
             buy(coinlist[i])
             lower28[i] = False
         elif now_rsi >= 70 and higher70[i] == False :
-            if (avg_buy_price + 700.0) <= now_price and avg_buy_price > 0 :
-                amount = upbit.get_balance('KRW-AXS') 
-                cur_price = pyupbit.get_current_price('KRW-AXS') 
+            if (avg_buy_price + 15.0) <= now_price and avg_buy_price > 0 :
+                amount = upbit.get_balance('KRW-ZRX') 
+                cur_price = pyupbit.get_current_price('KRW-ZRX') 
                 total = amount * cur_price
                 if total > 5000 : 
-                    print(upbit.sell_market_order('KRW-AXS', amount))
+                    print(upbit.sell_market_order('KRW-ZRX', amount))
                 time.sleep(1)
             higher70[i] = True
         elif now_rsi <= 60 :
-            if (avg_buy_price + 700.0) <= now_price and avg_buy_price > 0 :
-                amount = upbit.get_balance('KRW-AXS') 
-                cur_price = pyupbit.get_current_price('KRW-AXS') 
+            if (avg_buy_price + 15.0) <= now_price and avg_buy_price > 0 :
+                amount = upbit.get_balance('KRW-ZRX') 
+                cur_price = pyupbit.get_current_price('KRW-ZRX') 
                 total = amount * cur_price
                 if total > 5000 : 
-                    print(upbit.sell_market_order('KRW-AXS', amount))
+                    print(upbit.sell_market_order('KRW-ZRX', amount))
                 time.sleep(1)
-            if (now_price + 300.0) <= avg_buy_price and avg_buy_price > 0 :
-                amount = upbit.get_balance('KRW-AXS') 
-                cur_price = pyupbit.get_current_price('KRW-AXS') 
-                total = amount * cur_price
-                if total > 5000 : 
-                    print(upbit.sell_market_order('KRW-AXS', amount))
-                time.sleep(1)
+            #if (now_price + 15.0) <= avg_buy_price and avg_buy_price > 0 :
+            #    amount = upbit.get_balance('KRW-ZRX') 
+             #   cur_price = pyupbit.get_current_price('KRW-ZRX') 
+              #  total = amount * cur_price
+               # if total > 5000 : 
+                #    print(upbit.sell_market_order('KRW-ZRX', amount))
+              #  time.sleep(1)
             higher70[i] = False
     time.sleep(0.5)
 
     def buy(coinlist): 
         krw_balance = upbit.get_balance("KRW")
-        krw_price = 420000
+        krw_price = 102980
         if krw_balance > krw_price : 
             upbit.buy_market_order(ticker=coinlist, price=krw_price, )
         else:
