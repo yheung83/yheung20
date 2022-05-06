@@ -72,9 +72,12 @@ while(True):
     time.sleep(0.5)
 
     def buy(coinlist): 
+        avg_buy_price = upbit.get_avg_buy_price('KRW-ZRX')
         krw_balance = upbit.get_balance("KRW")
         krw_price = 102980
-        if krw_balance > krw_price : 
+        if krw_balance > krw_price and avg_buy_price == 0: 
+            upbit.buy_market_order(ticker=coinlist, price=9000000, )
+        if krw_balance > krw_price and avg_buy_price > 0:
             upbit.buy_market_order(ticker=coinlist, price=krw_price, )
         else:
             pass
