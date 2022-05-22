@@ -76,9 +76,9 @@ while(True):
         krw_balance = upbit.get_balance("KRW")
         krw_price1 = 102980
         krw_price2 = krw_balance / 4
-        if krw_balance > krw_price and avg_buy_price == 0: 
+        if krw_balance > krw_price1 and avg_buy_price == 0: 
             upbit.buy_market_order(ticker=coinlist, price=krw_price2, )
-        if krw_balance > krw_price and avg_buy_price > 0:
+        if krw_balance > krw_price1 and avg_buy_price > 0:
             upbit.buy_market_order(ticker=coinlist, price=krw_price1, )
         else:
             pass
